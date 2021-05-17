@@ -1,0 +1,64 @@
+
+
+The dataset was collected from Airbnb with data on listings in the city of Asheville, NC. Here is the data provided for each listing:
+•	room id: A unique number identifying an Airbnb listing.
+•	host id: A unique number identifying an Airbnb host.
+•	room type: One of 'Entire home/apt', 'Private room', or 'Shared room'
+•	reviews: The number of reviews that a listing has received.
+•	overall satisfaction: The average rating (out of five) that the listing has received from those visitors who left a review.
+•	accommodates: The number of guests a listing can accommodate.
+•	bedrooms: The number of bedrooms a listing offers.
+•	price: The price (in USD) for a night stay. 
+
+Loading the data
+```{r}
+# Load data and print head
+airbnb_data <- read.csv("airbnb_data.csv",header = TRUE)
+head(airbnb_data)
+```
+
+## Question 1: Fit a multiple linear regression model using price as the response variable and all others as predictor variables (Note: remove 'id' columns). Which variables are statistically significant in determining the price?
+
+
+```{r}
+# create model using 'lm' and print summary
+model1 <- lm(price ~ room_type + reviews + overall_satisfaction + accommodates + bedrooms, data = airbnb_data)
+summary(model1)
+```
+Statistically significant variables: overall_satisfaction, accommodates, bedrooms (can be concluded from p-values in the summary)
+
+## Question 2: Interpret the coefficients for predictors: room type(Shared Room), bedrooms? 
+
+
+Interpretations are as follows:
+1) Room type(Shared Room): Holding all other variables constant, a listing for a shared room has an estimated price of 76.67 USD less than an entire home/apt. 
+2) Bedrooms: Holding all other variables constant, the estimated price of a listing increases by 85.64 USD with an inremental bedroom in the property. 
+
+## Question 3: Predict the price (nearest dollar) for a listing with the following factors: bedrooms = 1, accommodates = 2, reviews = 70, overall_satisfaction = 4, and room_type= 'Private room'.
+
+```{r}
+# prepare prediction data and use 'predict' to find the value
+pred_data = data.frame(bedrooms = 1, accommodates = 2, reviews = 70, overall_satisfaction = 4, room_type = 'Private room')
+predict(model1, pred_data)
+```
+The estimated price for such a listing is 66 dollars.
+
+## Question 4: Identify outliers using Cook's distance approach. Remove points having Cook's distance > 1. Rerun the model after removal of these points and print summary.
+
+```{r}
+# Use cook's distance to identify outliers
+cooks <-cooks.distance(model1)
+which(cooks>1)
+```
+```{r}
+# remove the outliers
+airbnb_data_2 = airbnb_data[-c(94,95),]
+
+# creating new model and print summary
+model2 <- lm(price ~ room_type + reviews + overall_satisfaction + accommodates + bedrooms, data = airbnb_data_2)
+summary(model2)
+```
+```{r}
+
+```
+

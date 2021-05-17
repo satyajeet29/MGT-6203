@@ -1,0 +1,66 @@
+---
+title: "SA6"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(PerformanceAnalytics)
+library(xts)
+library(lubridate)
+```
+
+## Q1
+
+### a) Read in File and Print 10 Rows
+```{r}
+
+data = read.csv('Return_Dataset.csv')
+head(data,10)
+```
+### b) Print and Plot Cumulative Returns and then identify if KO and UPS beat the market.
+```{r}
+data$Date = mdy(data$Date)
+data = data[order(data$Date),]
+ts = xts(data[,-1],order.by = data[,1],)
+Return.cumulative(ts,geometric = TRUE)
+chart.CumReturns(ts,wealth.index = FALSE, legend.loc = 'topleft', geometric = TRUE)
+```  
+From what the graph looks like, in the long run both KO and UPS fail to beat the market. Though they do beat the RiskFree asset. This fact is even reflected in the cumulative returns, where the market grew by 51% but UPS and KO only grew by 29.5% and 46% respectively.  
+
+
+### c) Calculate Sharpe and Treynor Ratios for KO and UPS. Identify which is better. 
+```{r}
+SharpeRatio(ts$UPS,ts$RF)
+SharpeRatio(ts$KO,ts$RF)
+```
+
+Higher Sharpe ratios are better. In this case, KO  has a Sharpe ratio of .228 which is higher than the .104 of UPS's. 
+```{r}
+TreynorRatio(ts$UPS,ts$Mkt, ts$RF)
+TreynorRatio(ts$KO,ts$Mkt, ts$RF)
+```
+The Treynor Ratio for UPS is .046, and the Treynor Ratio for KO is .444. Higher Treynor risk also implies higher reward per unit risk, so KO would be better with this measurement too. 
+
+
+## Q2: Market Efficiencies.
+
+There are three market efficiencies:
+
+1) Weak Form: Implies that past prices and volume of the security has already been leveraged into the price and are no longer helpful giving any type of edge. 
+
+2) Semi-Strong Form: This implies that prices already reflect on the information that is publicly available and therefore no information that is public can help investors get a leg-up.  
+
+3) Strong Form: This implies that prices reflect 100% of all information both public and private. Any and all information has already been factored into the stock price and it is impossible to get an advantage. 
+
+## Q3: Behavioral Biases
+
+There are 4 kinds of Behavioral Biases
+
+1) Overconfidence: This is when you overestimate your own ability.
+
+2) Loss aversion: When investors seek pride and avoid regret in their decisions.
+
+3) Recency effect: When investors overemphasize a recent information and weigh past information less in error. 
+
+4) Anchoring: When Investors take action based on a single fact or figure and overemphasize that one aspect and ignoring other information that might be just as relevant if not more. 
